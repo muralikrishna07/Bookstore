@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 
 class bookListView(ListAPIView):
-    search_fields = ['author','book']
+    search_fields = ['author__name','title']
     filter_backends = (filters.SearchFilter,)
     queryset = Book.objects.all()
     serializer_class = BookSerializer

@@ -13,46 +13,61 @@ class Authorserializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Author
-        fields  = ['id','name','url']
+        fields  = ['id','author_name','url']
 
 
 
 class BookSerializer(serializers.ModelSerializer):
 
     
-    author=Authorserializer(many=True,read_only=True)
+    author_name=Authorserializer(many=True)
     
     class Meta:
         model = Book
-        fields = ['id','title','description','publisher','release_date','author']
+        fields = ['id','title','description','publisher','release_date','author_name']
 
     def create(self, validated_data):
-        author = validated_data.pop('author')
+        author_name = validated_data.pop('author_name')
         book = Book.objects.create(**validated_data)
-        for author in author:
-            author, created = Author.objects.get_or_create(name=author['name'])
-            book.author.add(author)
+        for author in author_name:
+            author, created = Author.objects.get_or_create(author_name=author['author_name'])
+            book.author_name.add(author)
         book.save()
         return book
 
-    def partial_update(self, instance, validated_data,partial=True):
-        author = validated_data.pop('author')
-        instance.title = validated_data['title']
-        instance.description=validated_data['description']
-        instance.publisher=validated_data['publisher']
-        instance.release_date=validated_data['release_date']
+    def update(self, instance, validated_data):
+        # author = validated_data.pop('author')
+        # instance.title = validated_data['title']
+        # instance.description=validated_data['description']
+        # instance.publisher=validated_data['publisher']
+        # instance.release_date=validated_data['release_date']
 
-        # instance.author = validated_data['author']
-        # instance.publication_date = validated_data['publication_date']
+        # instance.author.name = validated_data['author[name]']
+        # authors_list = []
+        # for author in author:
+        #     author, created = Author.objects.get_or_create(name=author['name'])
+        #     authors_list.append(author)
+        # instance.author.set(authors_list)
+        # instance.save()
+        # return instance 
+
         authors_list = []
-        for author in author:
-            author, created = Author.objects.get_or_create(name=author['name'])
-            authors_list.append(author)
-        instance.author.set(authors_list)
+        try:
+            author_name = validated_data.pop('author_name')
+            for author in author_name:
+                print(author)
+                author, created = Author.objects.get_or_create(author_name=author['author_name'])
+                authors_list.append(author)
+    
+        except:
+            authors_list = []
+            for i in instance.author_name.all():
+                authors_list.append(i)
+        instance.author_name.set(authors_list)
+        instance.title = validated_data.get('title', instance.title)
+        instance.description=validated_data.get('description', instance.description)
+        instance.publisher = validated_data.get('publisher', instance.publisher) 
+        instance.release_date = validated_data.get('release_date', instance.release_date)
         instance.save()
-        return instance 
-    
-
-
-    
+        return instance
 

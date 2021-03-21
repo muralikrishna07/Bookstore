@@ -7,14 +7,14 @@ class Book(models.Model):
     description = models.CharField(max_length=400,null=True)
     publisher = models.CharField(max_length=400,null=True)
     release_date = models.DateField(null=True)
-    author = models.ManyToManyField('Author')
+    author_name = models.ManyToManyField('Author')
 
     def __str__(self):
         return self.title
 
 
 class Author(models.Model):
-    name = models.CharField(max_length=225,null=True)
+    author_name = models.CharField(max_length=225,null=True)
 
     def __str__(self):
-        return self.name    
+        return self.author_name    
