@@ -36,38 +36,38 @@ class BookSerializer(serializers.ModelSerializer):
         return book
 
     def update(self, instance, validated_data):
-        # author = validated_data.pop('author')
-        # instance.title = validated_data['title']
-        # instance.description=validated_data['description']
-        # instance.publisher=validated_data['publisher']
-        # instance.release_date=validated_data['release_date']
-
-        # instance.author.name = validated_data['author[name]']
-        # authors_list = []
-        # for author in author:
-        #     author, created = Author.objects.get_or_create(name=author['name'])
-        #     authors_list.append(author)
-        # instance.author.set(authors_list)
-        # instance.save()
-        # return instance 
-
-        authors_list = []
-        try:
-            author_name = validated_data.pop('author_name')
+        author_name = validated_data.get('author_name',None)
+        instance.title = validated_data.get('title',instance.title)
+        instance.description=validated_data.get('description',instance.description)
+        instance.publisher=validated_data.get('publisher',instance.publisher)
+        instance.release_date=validated_data.get('release_date',instance.release_date)
+        while author_name is not None:
+            authors_list = []
             for author in author_name:
-                print(author)
                 author, created = Author.objects.get_or_create(author_name=author['author_name'])
                 authors_list.append(author)
-    
-        except:
-            authors_list = []
-            for i in instance.author_name.all():
-                authors_list.append(i)
-        instance.author_name.set(authors_list)
-        instance.title = validated_data.get('title', instance.title)
-        instance.description=validated_data.get('description', instance.description)
-        instance.publisher = validated_data.get('publisher', instance.publisher) 
-        instance.release_date = validated_data.get('release_date', instance.release_date)
+            instance.author_name.set(authors_list)
+            break
         instance.save()
-        return instance
+        return instance 
+
+        # authors_list = []
+        # try:
+        #     author_name = validated_data.pop('author_name')
+        #     for author in author_name:
+        #         print(author)
+        #         author, created = Author.objects.get_or_create(author_name=author['author_name'])
+        #         authors_list.append(author)
+    
+        # except:
+        #     authors_list = []
+        #     for i in instance.author_name.all():
+        #         authors_list.append(i)
+        # instance.author_name.set(authors_list)
+        # instance.title = validated_data.get('title', instance.title)
+        # instance.description=validated_data.get('description', instance.description)
+        # instance.publisher = validated_data.get('publisher', instance.publisher) 
+        # instance.release_date = validated_data.get('release_date', instance.release_date)
+        # instance.save()
+        # return instance
 
